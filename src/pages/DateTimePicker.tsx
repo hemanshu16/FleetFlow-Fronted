@@ -13,7 +13,7 @@ const DateTimePicker: React.FC = () => {
   return (
     <DatePicker
       showTime={{ use12Hours: true, format: 'hh:mm:ss A' }}
-       format="YYYY-MM-DD hh:mm:ss A Z"
+      format="YYYY-MM-DD hh:mm:ss A Z"
       value={value}
       onChange={onChange}
       placeholder="Select Date and Time"

@@ -2,7 +2,7 @@ import AppLayout from './pages/AppLayout'
 
 function App() {
   return (
-    <AppLayout />
+      <AppLayout />
   )
 }
 
