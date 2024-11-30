@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import handleAxiosError from '../utils/AxiosErrorHandling';
 import TripDetailRequest from '../models/TripDetailRequest';
+import TripDetails from '../pages/TripsDetails';
 
 const baseUrl = "http://localhost:8000";
 
@@ -30,7 +30,7 @@ export const saveTripDetails = async (requestData: TripDetailRequest): Promise<s
 };
 
 
-export const getTripDetails = async (pageNo: number, pageSize: number, order: string): Promise<string> => {
+export const getTripDetails = async (pageNo: number, pageSize: number, order: string): Promise<TripDetails> => {
   const config: AxiosRequestConfig = {
     method: 'get',
     maxBodyLength: Infinity,

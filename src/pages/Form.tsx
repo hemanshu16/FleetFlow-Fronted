@@ -119,7 +119,7 @@ const TripForm: React.FC<TripFormProps> = () => {
                                 required: true,
                                 message: 'Please select a start date and time!',
                             },
-                            ({ getFieldValue }) => ({
+                            ({}) => ({
 
                                 validator(_, value) {
                                     if (!value || value.isAfter(moment())) {

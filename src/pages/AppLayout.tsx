@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { Breadcrumb, Layout, theme } from 'antd';
 import './AppLayout.css';
 import TripsDetails from './TripsDetails';
-import DateTimePicker from './DateTimePicker';
 import TripsDetailsForm from './TripDetailsForm';
 
 const { Header, Content, Footer } = Layout;

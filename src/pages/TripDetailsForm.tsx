@@ -102,8 +102,8 @@ const TripsDetailsForm: React.FC = () => {
   };
 
   const handleOk = () => {
-    form.validateFields().then(value => submitFormDetails()).catch((errorInfo) => {
-
+    form.validateFields().then((_) => submitFormDetails()).catch((errorInfo) => {
+        console.log(errorInfo)
     });
   };
 
@@ -185,7 +185,7 @@ const TripsDetailsForm: React.FC = () => {
                     required: true,
                     message: 'Please select a start date and time!',
                   },
-                  ({ getFieldValue }) => ({
+                  ({}) => ({
 
                     validator(_, value) {
                       if (!value || value.isAfter(moment())) {

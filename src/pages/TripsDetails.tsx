@@ -3,18 +3,16 @@ import { Modal, notification, Table } from "antd";
 import { deleteTripDetails, getTripDetails } from "../service/TripService";
 import type { TableColumnsType, TablePaginationConfig } from "antd";
 import { createStyles } from "antd-style";
-import { FilterValue, SorterResult, TableCurrentDataSource } from "antd/es/table/interface";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import handleAxiosError from "../utils/AxiosErrorHandling";
 
-const useStyle = createStyles(({ css, token }) => {
-  const { antCls } = token;
+const useStyle = createStyles(({ css}) => {
   return {
     customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body,
-          ${antCls}-table-content {
+      ant-table {
+      ant-table-container {
+          ant-table-body,
+          ant-table-content {
             scrollbar-width: thin;
             scrollbar-color: #eaeaea transparent;
             scrollbar-gutter: stable;
@@ -190,10 +188,7 @@ const TripDetails: React.FC = () => {
   ];
 
   const handleTableChange = (
-    pagination: TablePaginationConfig,
-    filters: Record<string, FilterValue | null>,
-    sorter: SorterResult<Trip> | SorterResult<Trip>[],
-    extra: TableCurrentDataSource<Trip>
+    pagination: TablePaginationConfig
   ) => {
     // Use pagination.current with a fallback to the currentPage state
     const current = pagination.current || currentPage;
