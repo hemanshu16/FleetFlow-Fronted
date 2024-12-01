@@ -1,3 +1,14 @@
 .demo-logo {
   background-color: white;
 }
+
+.ant-layout-content{
+  padding: 0 48px!
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 0 2px;
+  }
+}

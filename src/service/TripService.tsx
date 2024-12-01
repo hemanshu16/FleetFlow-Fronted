@@ -1,13 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import TripDetailRequest from '../models/TripDetailRequest';
-import TripDetails from '../pages/TripsDetails';
+import { Trip, TripDetails } from '../pages/TripsDetails';
 
 const baseUrl = "http://54.162.51.81:8000";
 
 
 
 // Function to send a message
-export const saveTripDetails = async (requestData: TripDetailRequest): Promise<string> => {
+export const saveTripDetails = async (requestData: TripDetailRequest): Promise<Trip> => {
   // Prepare the data with type annotation
   const data: string = JSON.stringify(requestData);
 
@@ -24,8 +24,7 @@ export const saveTripDetails = async (requestData: TripDetailRequest): Promise<s
 
 
   const response: AxiosResponse = await axios.request(config);
-  console.log('Response data:', JSON.stringify(response.data));
-  return "successfully Sent Message";
+  return response.data;
 
 };
 

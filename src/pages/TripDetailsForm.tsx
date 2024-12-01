@@ -6,14 +6,19 @@ import moment from 'moment';
 import TripDetailRequest from '../models/TripDetailRequest';
 import { saveTripDetails } from '../service/TripService';
 import handleAxiosError from '../utils/AxiosErrorHandling';
+import { Trip } from './TripsDetails';
 
 type VinImeiPair = {
   vin: string; // VIN is a string
   imei: string; // IMEI is a string
 };
 
+type TripDetailsFormProps = {
+  setTripDetails: React.Dispatch<React.SetStateAction<Trip[]>>
+  setTotalElements : React.Dispatch<React.SetStateAction<number>>
+}
 
-const TripsDetailsForm: React.FC = () => {
+const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setTotalElements }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -103,7 +108,7 @@ const TripsDetailsForm: React.FC = () => {
 
   const handleOk = () => {
     form.validateFields().then((_) => submitFormDetails()).catch((errorInfo) => {
-        console.log(errorInfo)
+      console.log(errorInfo)
     });
   };
 
@@ -127,12 +132,19 @@ const TripsDetailsForm: React.FC = () => {
 
     setLoading(true);
     try {
-      await saveTripDetails(tripDetailsRequestDetails);
+
+      const savedTripDetails: Trip = await saveTripDetails(tripDetailsRequestDetails);
       api.success({
         message: 'Trip Saved SuccessFully',
       });
+
       setIsModalOpen(false);
 
+      setTripDetails((oldTripDetails: Trip[]) => {
+        return [...oldTripDetails, savedTripDetails];
+      })
+
+      setTotalElements(elemants => elemants+1);
 
     } catch (error) {
       if (error instanceof Error) {
@@ -144,11 +156,7 @@ const TripsDetailsForm: React.FC = () => {
     finally {
       setLoading(false);
     }
-
-
   }
-
-
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -185,7 +193,7 @@ const TripsDetailsForm: React.FC = () => {
                     required: true,
                     message: 'Please select a start date and time!',
                   },
-                  ({}) => ({
+                  ({ }) => ({
 
                     validator(_, value) {
                       if (!value || value.isAfter(moment())) {

@@ -30,7 +30,7 @@ interface ClientDetails {
   last_name: string;
 }
 
-interface Trip {
+export interface Trip {
   id: string;
   imei_number: string;
   vehicle_identification_number: string;
@@ -41,26 +41,33 @@ interface Trip {
   client_details: ClientDetails;
 }
 
-interface TripDetails {
+
+export interface TripDetails {
   "trip_details": Trip[]
   "page_no": number,
   "page_size": number,
   "total_pages": number,
+  "total_elements":number
+}
+
+type TripDetailsProps = {
+  setTripDetails :  React.Dispatch<React.SetStateAction<Trip[]>>
+  tripDetails : Trip[]
+  totalElemants : number
+  setTotalElements : React.Dispatch<React.SetStateAction<number>>
 }
 
 
-
-
-const TripDetails: React.FC = () => {
+const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDetails,totalElemants,setTotalElements}) => {
   const { styles } = useStyle();
-  const [tripDetails, setTripDetails] = useState<Trip[]>([]);
+
   const [trip, setTrip] = useState<Trip>();
 
   const [api, contextHolder] = notification.useNotification();
-  const [totalElemants, setTotal] = useState<number>(0);
+
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(5); // Default pageSize
-
+  const [pageReload, setPageReload] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = (record: Trip) => {
@@ -88,6 +95,7 @@ const TripDetails: React.FC = () => {
           return newDetails;
       })
     
+      setTotalElements(elemant => elemant-1);
       fetchTripDetails(currentPage,pageSize);
   
     } catch (error) {
@@ -100,7 +108,6 @@ const TripDetails: React.FC = () => {
     finally {
       // setLoading(false);
     }
-
     setIsModalOpen(false);
   };
 
@@ -147,12 +154,12 @@ const TripDetails: React.FC = () => {
       key: "start_time",
       render: (start_time, record) => (
         <>
-          <div>{start_time}</div>
+          <div>{new Date(start_time).toLocaleString()}</div>
           {record.actual_start_time && (
             <>
               <hr></hr>
               <div style={{ color: "gray" }}>
-                Actual: {record.actual_start_time}
+                Actual: {new Date(record.actual_start_time).toLocaleString()}
               </div>
             </>
           )}
@@ -165,13 +172,13 @@ const TripDetails: React.FC = () => {
       key: "end_time",
       render: (end_time, record) => (
         <>
-          <div>{end_time}</div>
+          <div>{new Date(end_time).toLocaleString()}</div>
           {record.actual_end_time && (
             <>
               <hr>
               </hr>
               <div style={{ color: "bold" }}>
-                Actual: {record.actual_end_time}
+                Actual: {new Date(record.actual_end_time).toLocaleString()}
               </div>
             </>
           )}
@@ -197,17 +204,18 @@ const TripDetails: React.FC = () => {
     // if(current)
     setCurrentPage(current - 1);
     setPageSize(size);
+    setPageReload(oldPage => oldPage+1);
   };
 
 
   useEffect(() => {
       fetchTripDetails(currentPage,pageSize);
-  }, [currentPage, pageSize]);
+  }, [pageReload]);
 
   const fetchTripDetails = async  (currentPage : number, pageSize : number) => {
       await getTripDetails(currentPage, pageSize, "ASC").then((data: TripDetails) => {
       setTripDetails(data.trip_details);
-      setTotal(data.total_pages*pageSize)
+      setTotalElements(data.total_elements)
     });
   }
 
@@ -254,4 +262,4 @@ const TripDetails: React.FC = () => {
   );
 };
 
-export default TripDetails;
+export default TripDetailsSection;
