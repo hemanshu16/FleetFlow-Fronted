@@ -3,7 +3,8 @@ type TripDetailRequest = {
     "vehicle_identification_number" : string,
     "start_time" : Date,    
     "end_time" : Date,
-    "client_id" : string
+    "client_id" : string,
+    "id" : string | undefined
  }
  
  export default TripDetailRequest;

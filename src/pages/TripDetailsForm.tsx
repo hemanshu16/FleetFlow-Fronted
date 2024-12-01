@@ -15,11 +15,15 @@ type VinImeiPair = {
 
 type TripDetailsFormProps = {
   setTripDetails: React.Dispatch<React.SetStateAction<Trip[]>>
-  setTotalElements : React.Dispatch<React.SetStateAction<number>>
+  setTotalElements: React.Dispatch<React.SetStateAction<number>>
+  editTripDetails: Trip | undefined
+  isModalOpen: boolean
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setEditTripDetails: React.Dispatch<React.SetStateAction<Trip | undefined>>
 }
 
-const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setTotalElements }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setTotalElements, editTripDetails, isModalOpen, setIsModalOpen, setEditTripDetails }) => {
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   type VinImeiList = VinImeiPair[];
@@ -39,6 +43,16 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       setClientDetailsMap(clientDetailsMap);
     })
   }, [])
+
+  if (editTripDetails != undefined && isModalOpen) {
+    form.setFieldsValue({ mobile_number: editTripDetails?.client_details.phone_number })
+    form.setFieldsValue({ name: editTripDetails?.client_details.first_name + " " + editTripDetails?.client_details.last_name })
+    form.setFieldsValue({ vin_number: editTripDetails.vehicle_identification_number });
+    form.setFieldsValue({ imei_number: editTripDetails.imei_number });
+    // console.log(editTripDetails.start_time);
+    // form.setFieldsValue({ start_date: editTripDetails.start_time ? moment(editTripDetails.start_time) : null });
+    // form.setFieldsValue({ end_date: moment(editTripDetails.end_time) });
+  }
 
 
   const vinImeiListPair: VinImeiList = [
@@ -127,7 +141,8 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       start_time: tripDetails.start_date.toISOString(),
       end_time: tripDetails.end_date.toISOString(),
       imei_number: tripDetails.imei_number,
-      vehicle_identification_number: tripDetails.vin_number
+      vehicle_identification_number: tripDetails.vin_number,
+      id: editTripDetails?.id
     }
 
     setLoading(true);
@@ -139,12 +154,31 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       });
 
       setIsModalOpen(false);
+      form.resetFields();
 
-      setTripDetails((oldTripDetails: Trip[]) => {
-        return [...oldTripDetails, savedTripDetails];
-      })
+      if (editTripDetails == undefined) {
+        setTripDetails((oldTripDetails: Trip[]) => {
+          return [...oldTripDetails, savedTripDetails];
+        })
+      }
+      else {
+        setTripDetails((oldTripDetails: Trip[]) => {
+           const newDetails = oldTripDetails.map( (data : Trip) => {
+              if(data.id == editTripDetails.id) 
+              {
+                return savedTripDetails;
+              }
+              else{
+                return editTripDetails;
+              }
+           }) 
+           return newDetails;
+        })
+      }
 
-      setTotalElements(elemants => elemants+1);
+      form.setFieldsValue({});
+
+      setTotalElements(elemants => elemants + 1);
 
     } catch (error) {
       if (error instanceof Error) {
@@ -160,6 +194,9 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setEditTripDetails(undefined);
+    console.log("Closed");
+    form.resetFields();
   };
 
   return (
@@ -168,7 +205,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       <Button type="primary" onClick={showModal}>
         + Trip Details
       </Button>
-      <Modal title="Trip Details" open={isModalOpen} onOk={handleOk} okText="submit" okButtonProps={{
+      <Modal title={editTripDetails != undefined ? "Edit Trip Details" : "Add Trip Details"} open={isModalOpen} onOk={handleOk} okText={editTripDetails != undefined ? "save" : "submit"} okButtonProps={{
         loading, // Controls the loading state on the OK button
         disabled: loading, // Optionally disable the button while loading
       }} onCancel={handleCancel}>
@@ -196,6 +233,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
                   ({ }) => ({
 
                     validator(_, value) {
+                      console.log(value)
                       if (!value || value.isAfter(moment())) {
                         return Promise.resolve();
                       }

@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import TripDetailRequest from '../models/TripDetailRequest';
 import { Trip, TripDetails } from '../pages/TripsDetails';
 
-const baseUrl = "http://54.162.51.81:8000";
+const baseUrl = "http://localhost:8000";
 
 
 
@@ -11,9 +11,11 @@ export const saveTripDetails = async (requestData: TripDetailRequest): Promise<T
   // Prepare the data with type annotation
   const data: string = JSON.stringify(requestData);
 
+  const methodType : string = requestData.id != undefined ? "put" : "post";
+
   // Define the Axios request configuration with type safety
   const config: AxiosRequestConfig = {
-    method: 'post',
+    method: methodType,
     maxBodyLength: Infinity,
     url: `${baseUrl}/api/trip`,
     headers: {
@@ -21,8 +23,7 @@ export const saveTripDetails = async (requestData: TripDetailRequest): Promise<T
     },
     data: data,
   };
-
-
+  
   const response: AxiosResponse = await axios.request(config);
   return response.data;
 

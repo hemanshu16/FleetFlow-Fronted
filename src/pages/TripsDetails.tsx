@@ -55,10 +55,12 @@ type TripDetailsProps = {
   tripDetails : Trip[]
   totalElemants : number
   setTotalElements : React.Dispatch<React.SetStateAction<number>>
+  setEditTripDetails : React.Dispatch<React.SetStateAction<Trip|undefined>> 
+  setIsModalOpen : React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDetails,totalElemants,setTotalElements}) => {
+const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDetails,totalElemants,setTotalElements,setEditTripDetails,setIsModalOpen}) => {
   const { styles } = useStyle();
 
   const [trip, setTrip] = useState<Trip>();
@@ -68,11 +70,11 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(5); // Default pageSize
   const [pageReload, setPageReload] = useState<number>(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setDeleteModalOpen] = useState(false);
 
   const showModal = (record: Trip) => {
     setTrip(record);
-    setIsModalOpen(true);
+    setDeleteModalOpen(true);
   };
 
   const handleOk = async () => {
@@ -108,11 +110,11 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
     finally {
       // setLoading(false);
     }
-    setIsModalOpen(false);
+    setDeleteModalOpen(false);
   };
 
   const handleCancel = () => {
-    setIsModalOpen(false);
+    setDeleteModalOpen(false);
   };
 
   const columns: TableColumnsType<Trip> = [
@@ -190,7 +192,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       key: "operation",
       fixed: "right",
       width: 70,
-      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined /> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
+      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined  onClick={() => { console.log("Edit opened"); setEditTripDetails(record); setIsModalOpen(true);}}/> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
     },
   ];
 
