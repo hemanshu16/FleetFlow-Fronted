@@ -5,6 +5,7 @@ import type { TableColumnsType, TablePaginationConfig } from "antd";
 import { createStyles } from "antd-style";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import handleAxiosError from "../utils/AxiosErrorHandling";
+import { ClientDetail } from "./ClientDetails";
 
 const useStyle = createStyles(({ css}) => {
   return {
@@ -23,12 +24,6 @@ const useStyle = createStyles(({ css}) => {
   };
 });
 
-interface ClientDetails {
-  id: string;
-  phone_number: string;
-  first_name: string;
-  last_name: string;
-}
 
 export interface Trip {
   id: string;
@@ -38,7 +33,7 @@ export interface Trip {
   end_time: string;
   actual_start_time: string | null;
   actual_end_time: string | null;
-  client_details: ClientDetails;
+  client_details: ClientDetail;
 }
 
 

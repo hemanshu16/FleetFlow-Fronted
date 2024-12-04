@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { ClientDetail } from '../pages/ClientDetails';
+import ClientDetailRequest from '../models/ClientDetailRequest';
 
-const baseUrl = "http://localhost:8000";
+const baseUrl = "http://54.162.51.81:8000";
 
 const handleAxiosError = (error: any) => {
   if (axios.isAxiosError(error)) {
@@ -63,6 +65,44 @@ export const getAllClientDetails = async (): Promise<any> => {
     let errorMessage: string = handleAxiosError(error);
     throw Error(errorMessage);
   }
+};
+
+
+export const deleteClientDetails = async (clientId: string): Promise<void> => {
+  const config: AxiosRequestConfig = {
+    method: 'delete',
+    maxBodyLength: Infinity,
+    url: `${baseUrl}/api/client/${clientId}`,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  };
+  await axios.request(config);
+
+};
+
+export const saveClientDetails = async (requestData: ClientDetailRequest): Promise<ClientDetail> => {
+  // Prepare the data with type annotation
+  const data: string = JSON.stringify(requestData);
+
+  const methodType : string = requestData.id != undefined ? "put" : "post";
+
+  console.log("Method Type From save Client Details");
+  console.log(methodType)
+  // Define the Axios request configuration with type safety
+  const config: AxiosRequestConfig = {
+    method: methodType,
+    maxBodyLength: Infinity,
+    url: `${baseUrl}/api/client`,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: data,
+  };
+
+  const response: AxiosResponse = await axios.request(config);
+  return response.data;
+
 };
 
 

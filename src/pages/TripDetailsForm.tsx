@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, DatePicker, Form, Modal, notification, Row, Select } from 'antd';
 import { getAllClientDetails } from '../service/ClientService';
-import ClientDetail from '../models/ClientDetail';
 import moment from 'moment';
 import TripDetailRequest from '../models/TripDetailRequest';
 import { saveTripDetails } from '../service/TripService';
 import handleAxiosError from '../utils/AxiosErrorHandling';
 import { Trip } from './TripsDetails';
+import { ClientDetail } from './ClientDetails';
 
 type VinImeiPair = {
   vin: string; // VIN is a string
@@ -127,6 +127,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
   };
 
   const getClientIdFromPhoneNumber = (phoneNumber: string) => {
+    //TODO : give notification that client details deleted now not exist
     return clientDetails?.filter(clientDetail => clientDetail.phone_number === phoneNumber)[0].id;
   }
 
@@ -169,7 +170,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
                 return savedTripDetails;
               }
               else{
-                return editTripDetails;
+                return data;
               }
            }) 
            return newDetails;
