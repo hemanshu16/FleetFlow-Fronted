@@ -4,7 +4,8 @@ type TripDetailRequest = {
     "start_time" : Date,    
     "end_time" : Date,
     "client_id" : string,
-    "id" : string | undefined
+    "id" : string | undefined,
+    "days" : string[]
  }
  
  export default TripDetailRequest;

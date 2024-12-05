@@ -141,7 +141,7 @@ const ClientDetailsSection: React.FC<TripDetailsProps> = ({clientDetails,setClie
       key: "operation",
       fixed: "right",
       width: 70,
-      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined  onClick={() => { console.log("Edit opened"); setEditClientDetails(record); setIsModalOpen(true);}}/> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
+      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined  onClick={() => { console.log(record); setEditClientDetails(record); setIsModalOpen(true);}}/> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
     },
   ];
 

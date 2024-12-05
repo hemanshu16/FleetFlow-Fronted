@@ -6,6 +6,7 @@ import { createStyles } from "antd-style";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import handleAxiosError from "../utils/AxiosErrorHandling";
 import { ClientDetail } from "./ClientDetails";
+import moment from "moment";
 
 const useStyle = createStyles(({ css}) => {
   return {
@@ -24,6 +25,7 @@ const useStyle = createStyles(({ css}) => {
   };
 });
 
+const daysOfWeek = new Array<string>("SUN","MON","TUE","WED","THU","FRI","SAT");
 
 export interface Trip {
   id: string;
@@ -34,6 +36,7 @@ export interface Trip {
   actual_start_time: string | null;
   actual_end_time: string | null;
   client_details: ClientDetail;
+  days : string
 }
 
 
@@ -151,15 +154,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       key: "start_time",
       render: (start_time, record) => (
         <>
-          <div>{new Date(start_time).toLocaleString()}</div>
-          {record.actual_start_time && (
-            <>
-              <hr></hr>
-              <div style={{ color: "gray" }}>
-                Actual: {new Date(record.actual_start_time).toLocaleString()}
-              </div>
-            </>
-          )}
+          <div>{moment.utc(start_time,"HH:mm").local().format("hh:mm:ss A")}</div>
         </>
       ),
     },
@@ -169,16 +164,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       key: "end_time",
       render: (end_time, record) => (
         <>
-          <div>{new Date(end_time).toLocaleString()}</div>
-          {record.actual_end_time && (
-            <>
-              <hr>
-              </hr>
-              <div style={{ color: "bold" }}>
-                Actual: {new Date(record.actual_end_time).toLocaleString()}
-              </div>
-            </>
-          )}
+          <div>{moment.utc(end_time,"HH:mm").local().format("hh:mm:ss A")}</div>
         </>
       ),
     },
@@ -187,7 +173,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       key: "operation",
       fixed: "right",
       width: 70,
-      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined  onClick={() => { console.log("Edit opened"); setEditTripDetails(record); setIsModalOpen(true);}}/> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
+      render: (_, record) => <div style={{ display: "flex", justifyContent: "space-between" }}> <a style={{ color: "blue" }}><EditOutlined  onClick={() => { console.log(record); setEditTripDetails(record); setIsModalOpen(true);}}/> </a>  <a style={{ color: "red" }} onClick={() => showModal(record)}><DeleteOutlined /></a></div>,
     },
   ];
 
@@ -240,14 +226,10 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
           <li><strong>Trip ID:</strong> {trip?.id}</li>
           <li><strong>IMEI Number:</strong> {trip?.imei_number}</li>
           <li><strong>Vehicle Identification Number:</strong> {trip?.vehicle_identification_number}</li>
-          <li><strong>Start Time:</strong> {trip?.start_time}</li>
-          <li><strong>End Time:</strong> {trip?.end_time}</li>
-          {trip?.actual_start_time && (
-            <li><strong>Actual Start Time:</strong> {trip.actual_start_time}</li>
-          )}
-          {trip?.actual_end_time && (
-            <li><strong>Actual End Time:</strong> {trip.actual_end_time}</li>
-          )}
+          <li><strong>Start Time:</strong> {moment.utc(trip?.start_time,"HH:mm").local().format("hh:mm:ss A")}</li>
+          <li><strong>End Time:</strong> {moment.utc(trip?.end_time,"HH:mm").local().format("hh:mm:ss A")}</li>
+          <li><strong>Days Of Week:</strong> {trip?.days.split(",").map((num : string) => daysOfWeek[parseInt(num)-1]).join(",")}</li>
+
           <li>
             <strong>Client Details:</strong> {trip?.client_details?.first_name}{" "}
             {trip?.client_details?.last_name} ({trip?.client_details?.phone_number})

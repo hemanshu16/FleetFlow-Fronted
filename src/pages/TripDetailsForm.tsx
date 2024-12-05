@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, DatePicker, Form, Modal, notification, Row, Select } from 'antd';
+import { Button, Col, Form, FormInstance, Modal, notification, Row, Select, TimePicker, Typography } from 'antd';
 import { getAllClientDetails } from '../service/ClientService';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import TripDetailRequest from '../models/TripDetailRequest';
 import { saveTripDetails } from '../service/TripService';
 import handleAxiosError from '../utils/AxiosErrorHandling';
 import { Trip } from './TripsDetails';
 import { ClientDetail } from './ClientDetails';
+import Checkbox from 'antd/es/checkbox/Checkbox';
+const { Title } = Typography;
+
 
 type VinImeiPair = {
   vin: string; // VIN is a string
@@ -32,7 +35,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
   const [clientDetailsMap, setClientDetailsMap] = useState<Map<string, ClientDetail>>(new Map());
 
   const [api, contextHolder] = notification.useNotification();
-
+  const [checkedList, setCheckedList] = useState<string[]>([]);
 
 
   useEffect(() => {
@@ -44,16 +47,23 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
     })
   }, [])
 
-  if (editTripDetails != undefined && isModalOpen) {
-    form.setFieldsValue({ mobile_number: editTripDetails?.client_details.phone_number })
-    form.setFieldsValue({ name: editTripDetails?.client_details.first_name + " " + editTripDetails?.client_details.last_name })
-    form.setFieldsValue({ vin_number: editTripDetails.vehicle_identification_number });
-    form.setFieldsValue({ imei_number: editTripDetails.imei_number });
-    // console.log(editTripDetails.start_time);
-    // form.setFieldsValue({ start_date: editTripDetails.start_time ? moment(editTripDetails.start_time) : null });
-    // form.setFieldsValue({ end_date: moment(editTripDetails.end_time) });
-  }
+  console.log("rendering done");
+  useEffect(() => {
+     console.log("Use Effect Called")
+     console.log(editTripDetails?.id)
+     console.log(isModalOpen)
+    if (editTripDetails != undefined && isModalOpen) {
+      form.setFieldsValue({ mobile_number: editTripDetails?.client_details.phone_number })
+      form.setFieldsValue({ name: editTripDetails?.client_details.first_name + " " + editTripDetails?.client_details.last_name })
+      form.setFieldsValue({ vin_number: editTripDetails.vehicle_identification_number });
+      form.setFieldsValue({ imei_number: editTripDetails.imei_number });
+      setCheckedList(editTripDetails.days.split(","))
+      console.log(editTripDetails.days)
+      form.setFieldsValue({ start_time: moment.utc(editTripDetails.start_time, "HH:mm:ss").local() });
+      form.setFieldsValue({ end_time: moment.utc(editTripDetails.end_time, "HH:mm:ss").local() });
+    }
 
+  }, [editTripDetails?.id]);
 
   const vinImeiListPair: VinImeiList = [
     {
@@ -132,17 +142,22 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
   }
 
 
+
+
   const submitFormDetails = async () => {
     const tripDetails = form.getFieldsValue();
     console.log(tripDetails)
+    console.log(checkedList);
+    console.log(tripDetails.start_time.toISOString().split("T")[1].split(".")[0]);
     const client_id: string | undefined = getClientIdFromPhoneNumber(tripDetails["mobile_number"]);
 
     const tripDetailsRequestDetails: TripDetailRequest = {
       client_id: client_id || "",
-      start_time: tripDetails.start_date.toISOString(),
-      end_time: tripDetails.end_date.toISOString(),
+      start_time: tripDetails.start_time.toISOString().split("T")[1].split(".")[0],
+      end_time: tripDetails.end_time.toISOString().split("T")[1].split(".")[0],
       imei_number: tripDetails.imei_number,
       vehicle_identification_number: tripDetails.vin_number,
+      days: checkedList,
       id: editTripDetails?.id
     }
 
@@ -164,21 +179,20 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       }
       else {
         setTripDetails((oldTripDetails: Trip[]) => {
-           const newDetails = oldTripDetails.map( (data : Trip) => {
-              if(data.id == editTripDetails.id) 
-              {
-                return savedTripDetails;
-              }
-              else{
-                return data;
-              }
-           }) 
-           return newDetails;
+          const newDetails = oldTripDetails.map((data: Trip) => {
+            if (data.id == editTripDetails.id) {
+              return savedTripDetails;
+            }
+            else {
+              return data;
+            }
+          })
+          return newDetails;
         })
       }
 
       form.setFieldsValue({});
-
+      setEditTripDetails(undefined);
       setTotalElements(elemants => elemants + 1);
 
     } catch (error) {
@@ -193,6 +207,10 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
     }
   }
 
+  const onChangeDays = (list: string[]) => {
+    setCheckedList(list);
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
     setEditTripDetails(undefined);
@@ -200,16 +218,22 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
     form.resetFields();
   };
 
+
+  console.log(moment(editTripDetails?.start_time, "HH:mm:ss").format("hh:mm:ss"))
+
   return (
     <>
       {contextHolder}
       <Button type="primary" onClick={showModal}>
         + Trip Details
       </Button>
-      <Modal title={editTripDetails != undefined ? "Edit Trip Details" : "Add Trip Details"} open={isModalOpen} onOk={handleOk} okText={editTripDetails != undefined ? "save" : "submit"} okButtonProps={{
+      <Modal open={isModalOpen} onOk={handleOk} okText={editTripDetails != undefined ? "save" : "submit"} okButtonProps={{
         loading, // Controls the loading state on the OK button
         disabled: loading, // Optionally disable the button while loading
       }} onCancel={handleCancel}>
+        <Title level={3} style={{ textAlign: "center", marginBottom: "20px" }}>
+          Trip Details
+        </Title>
         <Form layout="vertical" form={form} name='Trip Details'>
           <Form.Item label="VIN Number" name="vin_number" rules={[{ required: true, message: 'Please select a VIN number!' }]}>
             <Select placeholder="Select VIN Number" onChange={handleVinChange} showSearch>
@@ -221,69 +245,66 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
               {vinImeiListPair.map(item => <Select.Option value={item.imei}>{item.imei}</Select.Option>)}
             </Select>
           </Form.Item>
+
+          <Form.Item label="Select Days" name="days" rules={[
+            {
+              validator: (_, value) => {
+                if (checkedList.length > 0) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error("End time must be after start time!"));
+              },
+            }
+
+          ]}>
+            <Row justify="space-between">
+
+              <Checkbox.Group onChange={onChangeDays} value={checkedList}
+                options={[
+                  { label: 'Mon', value: '2' },
+                  { label: 'Tue', value: '3' },
+                  { label: 'Wed', value: '4' },
+                  { label: 'Thu', value: '5' },
+                  { label: 'Fri', value: '6' },
+                  { label: 'Sat', value: '7' },
+                  { label: 'Sun', value: '1' },
+                ]}
+              />
+            </Row>
+          </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Start Date"
-                name="start_date"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select a start date and time!',
-                  },
-                  ({ }) => ({
-
-                    validator(_, value) {
-                      console.log(value)
-                      if (!value || value.isAfter(moment())) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error('Start time must be in the future!'));
-                    },
-                  }),
-                ]}
-
+                label="Start Time"
+                name="start_time"
+                rules={[{ required: true, message: "Please select start time!" }]}
+              
               >
-                <DatePicker
-                  use12Hours
-                  showTime={{ format: 'HH:mm' }}
-                  format="YYYY-MM-DD hh:mm:ss"
-                  placeholder="Select Start Date"
-                  style={{ width: '100%' }}
-                />
+                <TimePicker use12Hours format="h:mm A" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                label="End Date"
-                name="end_date"
+                label="End Time"
+                name="end_time"
+              
                 rules={[
+                  { required: true, message: "Please select end time!" },
                   {
-                    required: true,
-                    message: 'Please select an end date and time!',
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      const startDateTime = getFieldValue('start_date');
-                      console.log(startDateTime)
-                      if (!value || !startDateTime || value.isAfter(startDateTime)) {
+                    validator: (_, value) => {
+                      const startTime: Moment = form.getFieldValue("start_time");
+                      if (!startTime || !value || value.isAfter(startTime)) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error('End time must be greater than start time!'));
+                      return Promise.reject(new Error("End time must be after start time!"));
                     },
-                  }),
-                ]}>
-                <DatePicker
-                  use12Hours
-                  showTime={{ format: 'HH:mm' }}
-                  format="YYYY-MM-DD hh:mm:ss"
-                  placeholder="Select End Date"
-                  style={{ width: '100%' }}
-                />
+                  },
+                ]}
+              >
+                <TimePicker use12Hours format="h:mm A" />
               </Form.Item>
             </Col>
           </Row>
-
           <Form.Item
             label="Name"
             name="name"

@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ClientDetail } from '../pages/ClientDetails';
 import ClientDetailRequest from '../models/ClientDetailRequest';
 
-const baseUrl = "http://54.162.51.81:8000";
+const baseUrl = "http://localhost:8000";
 
 const handleAxiosError = (error: any) => {
   if (axios.isAxiosError(error)) {
