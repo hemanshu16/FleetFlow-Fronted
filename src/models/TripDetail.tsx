@@ -6,7 +6,8 @@ type TripDetail = {
    "end_time" : Date,
    "actual_start_time" : Date,
    "actual_end_time" : Date,
-   "client_id" : string
+   "client_id" : string,
+   "operator_phone_number" : string
 }
 
 export default TripDetail;

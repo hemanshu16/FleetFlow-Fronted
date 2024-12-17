@@ -21,15 +21,17 @@ const AppLayout: FC = () => {
 
 
   return (
-    <Layout>
+    <Layout style={{boxSizing:'border-box',padding:'0px'}}>
       <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001529',height:"64px" }}>
         {/* Brand Name */}
-        <div style={{ color: 'white', fontSize: '20px', fontWeight: 'bold' }}>
+        <div style={{ color: 'white', fontSize: '20px', fontWeight: 'bold',
+          whiteSpace: 'nowrap'
+           }}>
           Fleet Flow
         </div>
 
         {/* Navigation Menu */}
-        <Menu theme="dark" mode="horizontal" style={{ minWidth: '300px', justifyContent: 'end' }}>
+        <Menu theme="dark" mode="horizontal" style={{ justifyContent: 'end' }}>
           <Menu.Item key="trips">
             <Link to="/trips">Trips</Link>
           </Menu.Item>

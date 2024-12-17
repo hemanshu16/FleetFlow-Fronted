@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, FormInstance, Modal, notification, Row, Select, TimePicker, Typography } from 'antd';
+import { Button, Col, Form, Input, Modal, notification, Row, Select, TimePicker, Typography } from 'antd';
 import { getAllClientDetails } from '../service/ClientService';
 import moment, { Moment } from 'moment';
 import TripDetailRequest from '../models/TripDetailRequest';
@@ -8,8 +8,9 @@ import handleAxiosError from '../utils/AxiosErrorHandling';
 import { Trip } from './TripsDetails';
 import { ClientDetail } from './ClientDetails';
 import Checkbox from 'antd/es/checkbox/Checkbox';
+import { countryCodes } from '../utils/Contant';
 const { Title } = Typography;
-
+const { Option } = Select;
 
 type VinImeiPair = {
   vin: string; // VIN is a string
@@ -47,20 +48,18 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
     })
   }, [])
 
-  console.log("rendering done");
   useEffect(() => {
-     console.log("Use Effect Called")
-     console.log(editTripDetails?.id)
-     console.log(isModalOpen)
     if (editTripDetails != undefined && isModalOpen) {
+      const countryCodeLength = editTripDetails.operator_phone_number.length - 10;
       form.setFieldsValue({ mobile_number: editTripDetails?.client_details.phone_number })
       form.setFieldsValue({ name: editTripDetails?.client_details.first_name + " " + editTripDetails?.client_details.last_name })
       form.setFieldsValue({ vin_number: editTripDetails.vehicle_identification_number });
       form.setFieldsValue({ imei_number: editTripDetails.imei_number });
       setCheckedList(editTripDetails.days.split(","))
-      console.log(editTripDetails.days)
       form.setFieldsValue({ start_time: moment.utc(editTripDetails.start_time, "HH:mm:ss").local() });
       form.setFieldsValue({ end_time: moment.utc(editTripDetails.end_time, "HH:mm:ss").local() });
+      form.setFieldsValue({ country_code: editTripDetails.operator_phone_number.substring(0,countryCodeLength) })
+      form.setFieldsValue({ operator_phone_number: editTripDetails.operator_phone_number.substring(countryCodeLength)});
     }
 
   }, [editTripDetails?.id]);
@@ -146,9 +145,6 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
 
   const submitFormDetails = async () => {
     const tripDetails = form.getFieldsValue();
-    console.log(tripDetails)
-    console.log(checkedList);
-    console.log(tripDetails.start_time.toISOString().split("T")[1].split(".")[0]);
     const client_id: string | undefined = getClientIdFromPhoneNumber(tripDetails["mobile_number"]);
 
     const tripDetailsRequestDetails: TripDetailRequest = {
@@ -158,7 +154,8 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
       imei_number: tripDetails.imei_number,
       vehicle_identification_number: tripDetails.vin_number,
       days: checkedList,
-      id: editTripDetails?.id
+      id: editTripDetails?.id,
+      operator_phone_number : tripDetails.country_code+tripDetails.operator_phone_number
     }
 
     setLoading(true);
@@ -219,8 +216,6 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
   };
 
 
-  console.log(moment(editTripDetails?.start_time, "HH:mm:ss").format("hh:mm:ss"))
-
   return (
     <>
       {contextHolder}
@@ -248,7 +243,7 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
 
           <Form.Item label="Select Days" name="days" rules={[
             {
-              validator: (_, value) => {
+              validator: (_, ) => {
                 if (checkedList.length > 0) {
                   return Promise.resolve();
                 }
@@ -258,7 +253,6 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
 
           ]}>
             <Row justify="space-between">
-
               <Checkbox.Group onChange={onChangeDays} value={checkedList}
                 options={[
                   { label: 'Mon', value: '2' },
@@ -305,6 +299,42 @@ const TripsDetailsForm: React.FC<TripDetailsFormProps> = ({ setTripDetails, setT
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item label="Operator Phone Number">
+            <Row gutter={16}>
+              <Col span={6}>
+                <Form.Item
+                  name="country_code"
+                  rules={[{ required: true, message: 'Please select a country code!' }]}
+                  noStyle
+                >
+                  <Select placeholder="Code">
+                    {countryCodes.map((item) => (
+                      <Option key={item.code} value={item.code}>
+                        {item.code} ({item.country})
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={18}>
+                <Form.Item
+                  name="operator_phone_number"
+                  rules={[
+                    { required: true, message: 'Please enter operator phone number!' },
+                    {
+                      pattern: /^\d{10}$/,
+                      message: 'Phone number must be exactly 10 digits!',
+                    },
+                  ]}
+                  noStyle
+                >
+                  <Input placeholder="Enter phone number" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form.Item>
+
           <Form.Item
             label="Name"
             name="name"

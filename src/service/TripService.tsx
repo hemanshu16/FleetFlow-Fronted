@@ -2,8 +2,8 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import TripDetailRequest from '../models/TripDetailRequest';
 import { Trip, TripDetails } from '../pages/TripsDetails';
 
-const baseUrl = "http://localhost:8000";
-
+const baseUrl = "http://54.162.51.81:8000";
+// const baseUrl = "http://localhost:8000"
 
 
 // Function to send a message

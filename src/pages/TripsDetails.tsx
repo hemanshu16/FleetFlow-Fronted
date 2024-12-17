@@ -36,7 +36,8 @@ export interface Trip {
   actual_start_time: string | null;
   actual_end_time: string | null;
   client_details: ClientDetail;
-  days : string
+  days : string,
+  operator_phone_number : string
 }
 
 
@@ -137,6 +138,12 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       ],
     },
     {
+      title: "Operator Phone Number",
+      dataIndex: "operator_phone_number",
+      key: "operator_phone_number",
+      width: 150,
+    },
+    {
       title: "IMEI Number",
       dataIndex: "imei_number",
       key: "imei_number",
@@ -152,7 +159,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       title: "Start Time",
       dataIndex: "start_time",
       key: "start_time",
-      render: (start_time, record) => (
+      render: (start_time) => (
         <>
           <div>{moment.utc(start_time,"HH:mm").local().format("hh:mm:ss A")}</div>
         </>
@@ -162,7 +169,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
       title: "End Time",
       dataIndex: "end_time",
       key: "end_time",
-      render: (end_time, record) => (
+      render: (end_time) => (
         <>
           <div>{moment.utc(end_time,"HH:mm").local().format("hh:mm:ss A")}</div>
         </>
@@ -229,7 +236,7 @@ const TripDetailsSection: React.FC<TripDetailsProps> = ({tripDetails,setTripDeta
           <li><strong>Start Time:</strong> {moment.utc(trip?.start_time,"HH:mm").local().format("hh:mm:ss A")}</li>
           <li><strong>End Time:</strong> {moment.utc(trip?.end_time,"HH:mm").local().format("hh:mm:ss A")}</li>
           <li><strong>Days Of Week:</strong> {trip?.days.split(",").map((num : string) => daysOfWeek[parseInt(num)-1]).join(",")}</li>
-
+          <li><strong>Operator phone number:</strong> {trip?.operator_phone_number}</li>
           <li>
             <strong>Client Details:</strong> {trip?.client_details?.first_name}{" "}
             {trip?.client_details?.last_name} ({trip?.client_details?.phone_number})

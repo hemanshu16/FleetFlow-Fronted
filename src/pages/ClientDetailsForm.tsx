@@ -4,6 +4,7 @@ import { saveClientDetails } from '../service/ClientService';
 import handleAxiosError from '../utils/AxiosErrorHandling';
 import { ClientDetail } from './ClientDetails';
 import ClientDetailRequest from '../models/ClientDetailRequest';
+import { countryCodes } from '../utils/Contant';
 
 const { Option } = Select;
 
@@ -117,13 +118,6 @@ const ClientDetailsForm: React.FC<TripDetailsFormProps> = ({ setClientDetails, s
     form.resetFields();
   };
 
-  const countryCodes = [
-    { code: '+1', country: 'USA' },
-    { code: '+91', country: 'India' },
-    { code: '+44', country: 'UK' },
-    { code: '+61', country: 'Australia' },
-    { code: '+81', country: 'Japan' },
-  ];
 
   const handleSubmit = (values: any) => {
     console.log('Form Values:', values);

@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --skipLibCheck && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
-    "antd": "^5.22.2",
+    "antd": "^5.22.3",
     "antd-style": "^3.7.1",
     "axios": "^1.7.8",
     "fleetflow": "file:",
